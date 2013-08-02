@@ -1,8 +1,8 @@
 <?php
 
+// TODO: Keep one file per week for other months than this month.
 // TODO: Use command line -f to do an actual delete.
 // TODO: This is really slow when deleting many files. Use a second array for deleted files.
-// TODO: Keep one file per week for other months than this month.
 // TODO: Drush module.
 
 // Set to TRUE if you want to really delete files.
@@ -42,14 +42,12 @@ if ($handle = opendir($path)) {
       $matches = array();
       preg_match($pattern_datetime, $entry, $matches);
       if (isset($matches[0])) {
-        // print_r($matches);
+        $file_date = new DateTime(
+          $matches[1] . '-' . $matches[2] . '-' . $matches[3] . ' ' . $matches[4] . ':' . $matches[5] . ':' . $matches[6]
+        );
+        
         $files_info[$path . '/' . $entry] = array(
-          'year' => $matches[1],
-          'month' => $matches[2],
-          'day' => $matches[3],
-          'hour' => $matches[4],
-          'min' => $matches[5],
-          'second' => $matches[6],
+          'timestamp' => $file_date,
           'delete' => FALSE,
         );
       }
@@ -58,10 +56,27 @@ if ($handle = opendir($path)) {
 
 ksort($files_info);
     
-// Prepare deletion. Keep one backup per day
+// Prepare: Check which files will be deleted. 
+$today = date('Y m d');
+$this_week = date('W');
 foreach ($files_info as $file => &$info) {
-  // Check if backup for this day exists
-  $files_for_day = file_for_date($files_info, $info['year'], $info['month'], $info['day']);
+  
+  // Skip today's backups
+  if ( $today == $info['timestamp']->format('Y m d') ) {
+    continue;
+  }
+  
+  // Keep one backup per day for this week
+  // Keep one backup per week for the rest    
+  if ( $this_week == $info['timestamp']->format('W') ) {
+    $files_for_day = files_for_period($files_info, $info['timestamp'], 'day');
+    // $info['debug'] = 'one per day';
+  } 
+  else {
+    $files_for_day = files_for_period($files_info, $info['timestamp'], 'week');
+    // $info['debug'] = 'one per week';
+  }
+  
   if (count($files_for_day) > 1) {
     $info['delete'] = TRUE;
   }
@@ -97,13 +112,29 @@ if (!$really_delete) {
 
 
 /**
- * Returns file names for a given date.
+ * Returns file names for a given period.
  * Consider only those files which were not marked for deletion.
+ * 
+ * @param $files_info array
+ * @param $timestamp DateTime 
+ *  Date within the period to search for
+ * @param $period string
+ *  Can be 'day' or 'week'.
+ *  
+ * @return array of filenames.
  */
-function file_for_date($files_info, $year, $month, $day) {
+function files_for_period($files_info, $timestamp, $period = 'day') {
   $ret = array();
+  
+  if ($period == 'day') {
+    $period_format = 'Y m d';
+  }
+  else if ($period == 'week') {
+    $period_format = 'W';
+  }
+  
   foreach($files_info as $file => $info) {
-    if (!$info['delete'] && $info['year'] == $year && $info['month'] == $month && $info['day'] == $day) {
+    if (!$info['delete'] && $info['timestamp']->format($period_format) == $timestamp->format($period_format) ) {
       $ret[] = $file;
     }
   }
