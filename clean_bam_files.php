@@ -18,12 +18,13 @@
  * This script works with both drupal 6 and 7 (actually, it doesn't require any drupal instance).
  */
 
-// TODO: Use command line -f to do an actual delete.
+// TODO: Option -f to do an actual delete.
+// TODO: Option -v to output deleted files
 // TODO: This is really slow when deleting many files. Use a second array for deleted files.
 // TODO: Drush module.
 
 // Set to TRUE if you want to really delete files.
-$really_delete = FALSE;
+$really_delete = TRUE;
 
 // Get command line arguments
 if (isset($argv[1])) {
