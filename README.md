@@ -9,7 +9,7 @@ Delete backup files in the following way
 - all the rest:      keep one backup per week
 
 Usage:
-  clean_bam_files.php <directory>
+  clean_bam_files.php [directory]
 
 Example:
   clean_bam_files.php /var/www/myproject/sites/default/files/backup_migrate/scheduled
