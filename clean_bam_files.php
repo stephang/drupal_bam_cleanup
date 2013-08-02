@@ -1,6 +1,23 @@
+#!/usr/bin/php
 <?php
 
-// TODO: Keep one file per week for other months than this month.
+/**
+ * Keep backup&migrate's scheduled folder small and lean.
+ * 
+ * Delete backup files in the following way
+ * - today:             keep all backups
+ * - this & last week:  keep one backup per day
+ * - all the rest:      keep one backup per week
+ * 
+ * Usage:
+ *  clean_bam_files.php <directory>
+ *  
+ * Example:
+ *  clean_bam_files.php /var/www/myproject/sites/default/files/backup_migrate/scheduled
+ *  
+ * This script works with both drupal 6 and 7 (actually, it doesn't require any drupal instance).
+ */
+
 // TODO: Use command line -f to do an actual delete.
 // TODO: This is really slow when deleting many files. Use a second array for deleted files.
 // TODO: Drush module.
@@ -59,6 +76,7 @@ ksort($files_info);
 // Prepare: Check which files will be deleted. 
 $today = date('Y m d');
 $this_week = date('W');
+$last_week = date('W', strtotime('last week'));
 foreach ($files_info as $file => &$info) {
   
   // Skip today's backups
@@ -68,16 +86,16 @@ foreach ($files_info as $file => &$info) {
   
   // Keep one backup per day for this week
   // Keep one backup per week for the rest    
-  if ( $this_week == $info['timestamp']->format('W') ) {
-    $files_for_day = files_for_period($files_info, $info['timestamp'], 'day');
+  if ( $this_week == $info['timestamp']->format('W') || $last_week == $info['timestamp']->format('W')) {
+    $files_for_period = files_for_period($files_info, $info['timestamp'], 'day');
     // $info['debug'] = 'one per day';
   } 
   else {
-    $files_for_day = files_for_period($files_info, $info['timestamp'], 'week');
+    $files_for_period = files_for_period($files_info, $info['timestamp'], 'week');
     // $info['debug'] = 'one per week';
   }
   
-  if (count($files_for_day) > 1) {
+  if (count($files_for_period) > 1) {
     $info['delete'] = TRUE;
   }
 }
