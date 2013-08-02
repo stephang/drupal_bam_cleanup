@@ -1,11 +1,14 @@
 <?php
 
-// TODO: This is really slow. Use a second array for deleted files.
+// TODO: Use command line -f to do an actual delete.
+// TODO: This is really slow when deleting many files. Use a second array for deleted files.
 // TODO: Keep one file per week for other months than this month.
 // TODO: Drush module.
 
+// Set to TRUE if you want to really delete files.
 $really_delete = FALSE;
 
+// Get command line arguments
 if (isset($argv[1])) {
   $path = $argv[1];
 }
@@ -13,22 +16,25 @@ else {
   $path = getcwd();
 }
 
-$protected_filenames = array(
+// Ignore these files
+$ignore_files = array(
   '.',
   '..',
   '.htaccess',
   'test.txt',
 );
 
+// Regex pattern which is used to extract date and time from filenames.
+// Examples: SiteName-2013-08-02T03-22-10.mysql.gz
+//           SiteName-2013-08-02_03-22-10.mysql.gz
 $pattern_datetime = '/-(\d{4}).(\d{2}).(\d{2})[T_\.](\d{2}).(\d{2}).(\d{2}).mysql(.gz)?$/';
 
 if ($handle = opendir($path)) {
     $files_info = array();
   
-    /* This is the correct way to loop over the directory. */
     while (false !== ($entry = readdir($handle))) {
-      // Exclude special files
-      if (in_array($entry, $protected_filenames) ) {
+      // Ignore special files
+      if (in_array($entry, $ignore_files) ) {
         continue;
       }
       
@@ -52,7 +58,7 @@ if ($handle = opendir($path)) {
 
 ksort($files_info);
     
-// Prepare deletion. Keep a backup per day
+// Prepare deletion. Keep one backup per day
 foreach ($files_info as $file => &$info) {
   // Check if backup for this day exists
   $files_for_day = file_for_date($files_info, $info['year'], $info['month'], $info['day']);
@@ -79,6 +85,7 @@ foreach ($files_info as $file => &$info) {
   echo "\n";
 }
 
+// Show saved disk space
 $saved_space /= 1024 * 1024;
 $saved_space = round($saved_space);
 echo "\nSaved disk space: $saved_space MB.\n";
@@ -86,6 +93,8 @@ echo "\nSaved disk space: $saved_space MB.\n";
 if (!$really_delete) {
   echo "Simulation only. Nothing was actually deleted.";
 }
+
+
 
 /**
  * Returns file names for a given date.
