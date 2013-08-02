@@ -16,7 +16,7 @@ $protected_filenames = array(
   'test.txt',
 );
 
-$pattern_datetime = '/(\d{4}).(\d{2}).(\d{2})[T_](\d{2}).(\d{2}).(\d{2}).mysql(.gz)?$/';
+$pattern_datetime = '/-(\d{4}).(\d{2}).(\d{2})[T_\.](\d{2}).(\d{2}).(\d{2}).mysql(.gz)?$/';
 
 if ($handle = opendir($path)) {
     $files_info = array();
