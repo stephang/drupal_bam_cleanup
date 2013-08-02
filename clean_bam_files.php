@@ -1,5 +1,7 @@
 <?php
 
+$really_delete = FALSE;
+
 if (isset($argv[1])) {
   $path = $argv[1];
 }
@@ -31,7 +33,7 @@ if ($handle = opendir($path)) {
       preg_match($pattern_datetime, $entry, $matches);
       if (isset($matches[0])) {
         // print_r($matches);
-        $files_info[$path . '/' . $matches[0]] = array(
+        $files_info[$path . '/' . $entry] = array(
           'year' => $matches[1],
           'month' => $matches[2],
           'day' => $matches[3],
@@ -59,6 +61,10 @@ foreach ($files_info as $file => &$info) {
 foreach ($files_info as $file => &$info) {
   if ($info['delete']) {
     echo "Delete $file";
+    if (@$really_delete) {
+      unlink($file);
+      echo " done.";
+    }
   }
   else {
     echo "Keep   $file";
