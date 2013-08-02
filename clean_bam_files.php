@@ -63,6 +63,7 @@ foreach ($files_info as $file => &$info) {
     echo "Delete $file";
     if (@$really_delete) {
       unlink($file);
+      @unlink($file . '.info');
       echo " done.";
     }
   }
