@@ -58,9 +58,11 @@ foreach ($files_info as $file => &$info) {
 }
 
 // Do actual delete
+$saved_space = 0;
 foreach ($files_info as $file => &$info) {
   if ($info['delete']) {
     echo "Delete $file";
+    $saved_space += filesize($file);
     if (@$really_delete) {
       unlink($file);
       @unlink($file . '.info');
@@ -71,6 +73,14 @@ foreach ($files_info as $file => &$info) {
     echo "Keep   $file";
   }
   echo "\n";
+}
+
+$saved_space /= 1024;
+$saved_space = round($saved_space);
+echo "\nSaved disk space: $saved_space kb.\n";
+
+if (!$really_delete) {
+  echo "Simulation only. Nothing was actually deleted.";
 }
 
 /**
