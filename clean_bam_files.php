@@ -1,5 +1,9 @@
 <?php
 
+// TODO: This is really slow. Use a second array for deleted files.
+// TODO: Keep one file per week for other months than this month.
+// TODO: Drush module.
+
 $really_delete = FALSE;
 
 if (isset($argv[1])) {
@@ -97,6 +101,3 @@ function file_for_date($files_info, $year, $month, $day) {
   return $ret;
 }
 ?>
-
-
-
