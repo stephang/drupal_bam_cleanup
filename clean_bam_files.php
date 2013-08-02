@@ -75,9 +75,9 @@ foreach ($files_info as $file => &$info) {
   echo "\n";
 }
 
-$saved_space /= 1024;
+$saved_space /= 1024 * 1024;
 $saved_space = round($saved_space);
-echo "\nSaved disk space: $saved_space kb.\n";
+echo "\nSaved disk space: $saved_space MB.\n";
 
 if (!$really_delete) {
   echo "Simulation only. Nothing was actually deleted.";
@@ -96,9 +96,6 @@ function file_for_date($files_info, $year, $month, $day) {
   }
   return $ret;
 }
-    
-// print_r($files_info);
-
 ?>
 
 
