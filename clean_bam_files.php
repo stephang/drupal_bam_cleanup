@@ -13,7 +13,7 @@
 // TODO: Drush module.
 
 // Set to TRUE if you want to really delete files.
-$really_delete = TRUE;
+$really_delete = FALSE;
 
 // Get command line arguments
 if (isset($argv[1])) {
@@ -34,6 +34,7 @@ $ignore_files = array(
 // Regex pattern which is used to extract date and time from filenames.
 // Examples: SiteName-2013-08-02T03-22-10.mysql.gz
 //           SiteName-2013-08-02_03-22-10.mysql.gz
+//           SiteName-2011.06.14_13.49.18.mysql.gz
 $pattern_datetime = '/-(\d{4}).(\d{2}).(\d{2})[T_\.](\d{2}).(\d{2}).(\d{2}).mysql(.gz)?$/';
 
 if ($handle = opendir($path)) {
@@ -65,8 +66,8 @@ ksort($files_info);
     
 // Prepare: Check which files will be deleted. 
 $today = date('Y m d');
-$this_week = date('W');
-$last_week = date('W', strtotime('last week'));
+$this_week = date('Y W');
+$last_week = date('Y W', strtotime('last week'));
 foreach ($files_info as $file => &$info) {
   
   // Skip today's backups
@@ -76,7 +77,7 @@ foreach ($files_info as $file => &$info) {
   
   // Keep one backup per day for this week
   // Keep one backup per week for the rest    
-  if ( $this_week == $info['timestamp']->format('W') || $last_week == $info['timestamp']->format('W')) {
+  if ( $this_week == $info['timestamp']->format('Y W') || $last_week == $info['timestamp']->format('Y W')) {
     $files_for_period = files_for_period($files_info, $info['timestamp'], 'day');
     // $info['debug'] = 'one per day';
   } 
@@ -138,7 +139,7 @@ function files_for_period($files_info, $timestamp, $period = 'day') {
     $period_format = 'Y m d';
   }
   else if ($period == 'week') {
-    $period_format = 'W';
+    $period_format = 'Y W';
   }
   
   foreach($files_info as $file => $info) {
