@@ -68,7 +68,10 @@ ksort($files_info);
 $today = date('Y m d');
 $this_week = date('Y W');
 $last_week = date('Y W', strtotime('last week'));
+
+echo 'Please wait ..';
 foreach ($files_info as $file => &$info) {
+  echo '.';
   
   // Skip today's backups
   if ( $today == $info['timestamp']->format('Y m d') ) {
@@ -90,6 +93,7 @@ foreach ($files_info as $file => &$info) {
     $info['delete'] = TRUE;
   }
 }
+echo "\n";
 
 // Do actual delete
 $saved_space = 0;
