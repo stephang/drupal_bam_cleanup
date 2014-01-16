@@ -11,8 +11,12 @@ Delete backup files on the local filesystem in the following way
 Usage:
   clean_bam_files.php [directory]
 
-Example:
+Usage examples:
+  # Clean one specific directory
   clean_bam_files.php /var/www/myproject/sites/default/files/backup_migrate/scheduled
+  
+  # Alternatively: Clean all backup&migrate scheduled directories
+  find -name scheduled -exec clean_bam_files.php {} \;
 
 This script works with both drupal 6 and 7 (actually, it doesn't require any drupal instance).
 
