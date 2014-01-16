@@ -12,6 +12,7 @@ Usage:
   clean_bam_files.php [directory]
 
 Usage examples:
+
   # Clean one specific directory
   clean_bam_files.php /var/www/myproject/sites/default/files/backup_migrate/scheduled
   
